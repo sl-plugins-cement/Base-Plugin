@@ -1,4 +1,6 @@
-﻿using LabApi.Features;
+﻿using BasePlugin_LabAPI.Events;
+using LabApi.Events.CustomHandlers;
+using LabApi.Features;
 using LabApi.Features.Console;
 using LabApi.Loader;
 using LabApi.Loader.Features.Plugins;
@@ -12,7 +14,7 @@ namespace BasePlugin_LabAPI
         public override string Name { get; } = "BasePlugin";
 
         // 插件描述
-        public override string Description { get; } = "提供如 [无限子弹] 等基础功能";
+        public override string Description { get; } = "提供如 [无限弹药] 等基础功能";
 
         // 插件作者
         public override string Author { get; } = "create_xiaoyu";
@@ -24,13 +26,13 @@ namespace BasePlugin_LabAPI
         public override Version RequiredApiVersion { get; } = new(LabApiProperties.CompiledVersion);
 
         // 配置类
-        public PluginConfig Config;
+        public static PluginConfig Config { get; private set; }
 
         // 配置是否成功加载
         public bool IsSuccessLoadConfig = true;
 
-        // 是否启用插件
-        public bool IsEnable = true;
+        // 玩家事件
+        public PlayerEvents PlayerEvent { get; } = new();
 
         // 插件启用
         public override void Enable()
@@ -42,13 +44,8 @@ namespace BasePlugin_LabAPI
                 return;
             }
 
-            IsEnable = Config.IsEnable;
-
-            if (!IsEnable)
-            {
-                Logger.Info("配置中未启用插件，停止加载");
-                return;
-            }
+            Logger.Debug("注册玩家事件", Config.Debug);
+            CustomHandlersManager.RegisterEventsHandler(PlayerEvent);
 
             Logger.Info("插件已加载");
         }
@@ -56,6 +53,9 @@ namespace BasePlugin_LabAPI
         // 插件禁用
         public override void Disable()
         {
+            Logger.Debug("注销玩家事件", Config.Debug);
+            CustomHandlersManager.UnregisterEventsHandler(PlayerEvent);
+
             Logger.Info("插件已禁用");
         }
 
@@ -64,7 +64,8 @@ namespace BasePlugin_LabAPI
         {
             base.LoadConfigs();
 
-            IsSuccessLoadConfig = this.TryLoadConfig("config.yml", out Config);
+            IsSuccessLoadConfig = this.TryLoadConfig("config.yml", out PluginConfig config);
+            Config = config;
         }
     }
 }
