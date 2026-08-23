@@ -1,7 +1,9 @@
-﻿using LabApi.Events.Arguments.PlayerEvents;
+﻿using Interactables.Interobjects.DoorUtils;
+using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.CustomHandlers;
 using LabApi.Features.Console;
 using LabApi.Features.Wrappers;
+using BasePlugin_LabAPI.Utils;
 
 namespace BasePlugin_LabAPI.Events
 {
@@ -43,6 +45,73 @@ namespace BasePlugin_LabAPI.Events
                     $"武器子弹数量: {item.StoredAmmo}\n" +
                     $"武器最大容量: {item.MaxAmmo}\n" +
                     $"添加子弹数量: {item.MaxAmmo - item.StoredAmmo - AmmoInventory}", MainClass.Config.Debug);
+            }
+        }
+
+        // 玩家操作门事件
+        //
+        // 便携钥匙功能实现
+        public override void OnPlayerInteractingDoor(PlayerInteractingDoorEventArgs eventArgs)
+        {
+            Player player = eventArgs.Player; // 获取玩家对象
+            Door door = eventArgs.Door;
+
+            if (!PortableKeyCard.IsReturn(player, door.Permissions, door.IsLocked))
+            {
+                if (PortableKeyCard.IsOpen(player, door.Permissions, door.DoorName.ToString(), door.IsOpened, door.IsLocked))
+                {
+                    eventArgs.CanOpen = true;
+                }
+            }
+        }
+
+        // 玩家解锁 Alpha 核弹按钮 事件
+        //
+        // 便携钥匙功能实现
+        public override void OnPlayerUnlockingWarheadButton(PlayerUnlockingWarheadButtonEventArgs eventArgs)
+        {
+            Player player = eventArgs.Player; // 获取玩家对象
+
+            if (!PortableKeyCard.IsReturn(player, DoorPermissionFlags.AlphaWarhead, false))
+            {
+                if (PortableKeyCard.IsOpen(player, DoorPermissionFlags.AlphaWarhead, "AlphaWarheadButton", false, false))
+                {
+                    eventArgs.IsAllowed = true;
+                }
+            }
+        }
+
+        // 玩家解锁 发电机 事件
+        //
+        // 便携钥匙功能实现
+        public override void OnPlayerUnlockingGenerator(PlayerUnlockingGeneratorEventArgs eventArgs)
+        {
+            Player player = eventArgs.Player; // 获取玩家对象
+            Generator generator = eventArgs.Generator; // 获取发电站对象
+
+            if (!PortableKeyCard.IsReturn(player, generator.RequiredPermissions, false))
+            {
+                if (PortableKeyCard.IsOpen(player, generator.RequiredPermissions, "generator", generator.IsOpen, generator.IsUnlocked))
+                {
+                    generator.IsUnlocked = true;
+                }
+            }
+        }
+
+        // 玩家解锁 储物柜 事件
+        //
+        // 便携钥匙功能实现
+        public override void OnPlayerInteractingLocker(PlayerInteractingLockerEventArgs eventArgs)
+        {
+            Player player = eventArgs.Player;
+            LockerChamber chamber = eventArgs.Chamber;
+
+            if (!PortableKeyCard.IsReturn(player, chamber.RequiredPermissions, false))
+            {
+                if (PortableKeyCard.IsOpen(player, chamber.RequiredPermissions, "locker", chamber.IsOpen, false))
+                {
+                    eventArgs.CanOpen = true;
+                }
             }
         }
     }
