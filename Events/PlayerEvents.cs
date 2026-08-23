@@ -1,9 +1,14 @@
-﻿using Interactables.Interobjects.DoorUtils;
+﻿using BasePlugin_LabAPI.Utils;
+using HintServiceMeow.Core.Models.Hints;
+using Interactables.Interobjects.DoorUtils;
 using LabApi.Events.Arguments.PlayerEvents;
 using LabApi.Events.CustomHandlers;
 using LabApi.Features.Console;
 using LabApi.Features.Wrappers;
-using BasePlugin_LabAPI.Utils;
+using PlayerStatsSystem;
+using PlayerRoles;
+using HintServiceMeow.Core.Utilities;
+using HintServiceMeow.Core.Extension;
 
 namespace BasePlugin_LabAPI.Events
 {
@@ -112,6 +117,65 @@ namespace BasePlugin_LabAPI.Events
                 {
                     eventArgs.CanOpen = true;
                 }
+            }
+        }
+
+        // 玩家受伤事件
+        //
+        // 有益可乐功能实现
+        public override void OnPlayerHurting(PlayerHurtingEventArgs eventArgs)
+        {
+            // 判断是不是 SCP-207 造成的伤害
+            if (eventArgs.DamageHandler is UniversalDamageHandler handler && handler.TranslationId == DeathTranslations.Scp207.Id)
+            {
+                if (MainClass.Config.BeneficialSCP207)
+                {
+                    // 取消这次伤害
+                    eventArgs.IsAllowed = false;
+                }
+            }
+        }
+
+        // 玩家死亡事件
+        //
+        // 击杀播报功能实现
+        public override void OnPlayerDeath(PlayerDeathEventArgs eventArgs)
+        {
+            if (!MainClass.Config.KillBroadcast) return;
+
+            Player player = eventArgs.Player; // 获取玩家对象
+            Player attacker = eventArgs.Attacker; // 获取攻击者对象
+
+            if (attacker != null && attacker.IsPlayer) // 判断是不是玩家造成的死亡
+            {
+                string name = attacker.Nickname; // 获取攻击者名称
+
+                if (attacker.Role == RoleTypeId.Scp3114) // 如果是 SCP-3114 则隐藏玩家名字
+                {
+                    name = "SCP-3114";
+                }
+
+                string text = MainClass.Config.KillBroadcastText.Replace("{attacker}", name).Replace("{victim}", player.Nickname);
+
+                Hint hint = new Hint
+                {
+                    Text =  text
+                };
+
+                hint.YCoordinate = MainClass.Config.KillBroadcastDisplayY;
+                hint.FontSize = MainClass.Config.KillBroadcastDisplaySize;
+
+                foreach (Player p in Player.List)
+                {
+                    PlayerDisplay play = PlayerDisplay.Get(p);
+                    play.ShowHint(hint, MainClass.Config.KillBroadcastDisplayTime);
+                }
+
+                Logger.Debug(
+                    "[击杀播报] 功能:\n" +
+                    $"攻击者: {attacker.Nickname}\n" +
+                    $"死亡者: {player.Nickname}\n" +
+                    $"最终播报内容: {text}", MainClass.Config.Debug);
             }
         }
     }

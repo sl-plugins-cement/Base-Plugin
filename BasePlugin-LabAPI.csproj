@@ -22,6 +22,9 @@
     <Reference Include="CommandSystem.Core">
       <HintPath>..\Resources\Managed\CommandSystem.Core.dll</HintPath>
     </Reference>
+    <Reference Include="HintServiceMeow">
+      <HintPath>..\Resources\HintServiceMeow-LabAPI.dll</HintPath>
+    </Reference>
     <Reference Include="Mirror">
       <HintPath>..\Resources\Managed\Mirror.dll</HintPath>
     </Reference>
