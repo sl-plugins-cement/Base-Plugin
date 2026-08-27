@@ -92,5 +92,49 @@ namespace BasePlugin_LabAPI.Utils
             }
             return false;
         }
+
+        public static bool IsOpenDoor(
+            Player player,
+            DoorPermissionsPolicy permissionsPolicy,
+            IDoorPermissionRequester requester,
+            string doorName = "Unknown",
+            bool IsOpened = false,
+            bool IsLocked = false)
+        {
+            DoorPermissionFlags requiredPermissions = permissionsPolicy.RequiredPermissions;
+
+            Logger.Debug(
+                $"玩家: {player.Nickname} 完整触发 [便携钥匙] 功能\n" +
+                $"被操作门类型: {doorName}\n" +
+                $"被操作门权限: {requiredPermissions}\n" +
+                $"权限策略: {(permissionsPolicy.RequireAll ? "需要全部权限" : "满足任一权限")}\n" +
+                $"被操作门状态:\n" +
+                $"开启: {IsOpened}\n" +
+                $"锁定: {IsLocked}", MainClass.Config.Debug);
+
+            IEnumerable<KeycardItem> keycards = player.Items.OfType<KeycardItem>();
+
+            Logger.Debug($"背包中的权限卡数量: {keycards.Count()}", MainClass.Config.Debug);
+
+            foreach (KeycardItem item in keycards)
+            {
+                DoorPermissionFlags contextualPermissions = item.Base.GetPermissions(requester);
+                bool isAllowed = permissionsPolicy.CheckPermissions(item.Base, requester, out _);
+
+                Logger.Debug(
+                    $"权限卡 {item.Type}\n" +
+                    $"卡权限: {contextualPermissions} ({(int)contextualPermissions})\n" +
+                    $"门权限: {requiredPermissions} ({(int)requiredPermissions})\n" +
+                    $"权限策略: {(permissionsPolicy.RequireAll ? "全部" : "任一")}\n" +
+                    $"是否满足: {isAllowed}", MainClass.Config.Debug);
+
+                if (isAllowed)
+                {
+                    return true;
+                }
+            }
+
+            return false;
+        }
     }
 }
