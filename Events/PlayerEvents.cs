@@ -63,7 +63,13 @@ namespace BasePlugin_LabAPI.Events
 
             if (!PortableKeyCard.IsReturn(player, door.Permissions, door.IsLocked))
             {
-                if (PortableKeyCard.IsOpen(player, door.Permissions, door.DoorName.ToString(), door.IsOpened, door.IsLocked))
+                if (PortableKeyCard.IsOpenDoor(
+                    player,
+                    door.Base.RequiredPermissions,
+                    door.Base,
+                    door.DoorName.ToString(),
+                    door.IsOpened,
+                    door.IsLocked))
                 {
                     eventArgs.CanOpen = true;
                 }
