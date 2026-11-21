@@ -41,18 +41,25 @@ namespace BasePlugin_LabAPI.Features
             }
 
             int reserve = player.GetAmmo(firearm.AmmoType);
-            int topUp = needed - reserve;
+            int topUp = Math.Min(needed - reserve, ushort.MaxValue - reserve);
             if (topUp > 0)
             {
-                player.AddAmmo(firearm.AmmoType, (ushort)Math.Min(topUp, ushort.MaxValue - reserve));
-                Remember(player, firearm.AmmoType, topUp);
+                player.AddAmmo(firearm.AmmoType, (ushort)topUp);
             }
 
             // 补足后重新走一遍原版校验，只放行“缺备弹”这一个原因；武器正忙（换弹中、检视中等）仍按原版拒绝。
             ev.IsAllowed = IReloadUnloadValidatorModule.ValidateReload(firearm.Base) && !firearm.Base.AnyModuleBusy();
-            if (!ev.IsAllowed)
+            if (topUp > 0)
             {
-                Reclaim(player);
+                if (ev.IsAllowed)
+                {
+                    Remember(player, firearm.AmmoType, topUp);
+                }
+                else
+                {
+                    // 只撤回本次请求的补给，保留正在进行的换弹所需的备弹。
+                    player.SetAmmo(firearm.AmmoType, (ushort)reserve);
+                }
             }
 
             Log.Debug(() => $"[无限弹药] {player.Nickname} 换弹 {firearm.Type}：弹匣 {firearm.StoredAmmo}/{firearm.MaxAmmo}，" +
