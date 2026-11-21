@@ -89,12 +89,12 @@ namespace BasePlugin_LabAPI.Features
         {
             if (settings.MaxHealth > 0)
             {
-                player.MaxHealth = settings.MaxHealth;
+                player.MaxHealth = (float)settings.MaxHealth;
             }
 
             if (settings.Health > 0)
             {
-                player.Health = Math.Min(settings.Health, player.MaxHealth);
+                player.Health = Math.Min((float)settings.Health, player.MaxHealth);
             }
             else if (settings.MaxHealth > 0)
             {
@@ -111,10 +111,10 @@ namespace BasePlugin_LabAPI.Features
 
             AhpStat ahp = player.ReferenceHub.playerStats.GetModule<AhpStat>();
             ahp.ServerAddProcess(
-                settings.ArtificialHealth,
-                settings.ArtificialHealth,
-                Math.Max(0f, settings.ArtificialHealthDecay),
-                Clamp01(settings.ArtificialHealthEfficacy),
+                (float)settings.ArtificialHealth,
+                (float)settings.ArtificialHealth,
+                Math.Max(0f, (float)settings.ArtificialHealthDecay),
+                Clamp01((float)settings.ArtificialHealthEfficacy),
                 0f,
                 settings.ArtificialHealthPersistent);
         }
@@ -129,7 +129,7 @@ namespace BasePlugin_LabAPI.Features
 
             if (settings.MaxHumeShield >= 0)
             {
-                player.MaxHumeShield = settings.MaxHumeShield;
+                player.MaxHumeShield = (float)settings.MaxHumeShield;
                 _humeShieldOverridden.Add(player.NetworkId);
             }
             else
@@ -139,13 +139,13 @@ namespace BasePlugin_LabAPI.Features
 
             if (settings.HumeShield >= 0)
             {
-                player.HumeShield = settings.MaxHumeShield >= 0
+                player.HumeShield = (float)(settings.MaxHumeShield >= 0
                     ? Math.Min(settings.HumeShield, settings.MaxHumeShield)
-                    : settings.HumeShield;
+                    : settings.HumeShield);
             }
             else if (settings.MaxHumeShield >= 0)
             {
-                player.HumeShield = settings.MaxHumeShield;
+                player.HumeShield = (float)settings.MaxHumeShield;
             }
 
             // 回复速度与冷却只存在于原版的动态护盾控制器上；对象池在下次生成时会恢复它们的初始值。
@@ -153,12 +153,12 @@ namespace BasePlugin_LabAPI.Features
             {
                 if (settings.HumeShieldRegenRate >= 0)
                 {
-                    controller.RegenerationRate = settings.HumeShieldRegenRate;
+                    controller.RegenerationRate = (float)settings.HumeShieldRegenRate;
                 }
 
                 if (settings.HumeShieldRegenCooldown >= 0)
                 {
-                    controller.RegenerationCooldown = settings.HumeShieldRegenCooldown;
+                    controller.RegenerationCooldown = (float)settings.HumeShieldRegenCooldown;
                 }
             }
         }
@@ -189,7 +189,7 @@ namespace BasePlugin_LabAPI.Features
                     continue;
                 }
 
-                player.EnableEffect(status, effect.Intensity, Math.Max(0f, effect.Duration));
+                player.EnableEffect(status, effect.Intensity, Math.Max(0f, (float)effect.Duration));
             }
         }
 

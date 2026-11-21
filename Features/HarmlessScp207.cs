@@ -18,7 +18,7 @@ namespace BasePlugin_LabAPI.Features
                 return;
             }
 
-            float multiplier = Math.Max(0f, MainClass.Config.Scp207.DamageMultiplier);
+            float multiplier = Math.Max(0f, (float)MainClass.Config.Scp207.DamageMultiplier);
             if (multiplier <= 0f)
             {
                 ev.IsAllowed = false;

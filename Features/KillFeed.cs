@@ -50,8 +50,8 @@ namespace BasePlugin_LabAPI.Features
 
         public void ApplyLayout()
         {
-            _hint.YCoordinate = Config.YCoordinate;
-            _hint.XCoordinate = Config.XCoordinate;
+            _hint.YCoordinate = (float)Config.YCoordinate;
+            _hint.XCoordinate = (float)Config.XCoordinate;
             _hint.Alignment = Config.Alignment;
             _hint.FontSize = Math.Max(1, Config.FontSize);
             Render();
@@ -131,7 +131,7 @@ namespace BasePlugin_LabAPI.Features
 
         private void Push(string line)
         {
-            _lines.Insert(0, (line, Time.time + Math.Max(0.5f, Config.LineDuration)));
+            _lines.Insert(0, (line, Time.time + Math.Max(0.5f, (float)Config.LineDuration)));
 
             int max = Math.Max(1, Config.MaxLines);
             if (_lines.Count > max)

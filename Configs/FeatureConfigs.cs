@@ -43,7 +43,7 @@ namespace BasePlugin_LabAPI.Configs
         public bool Enabled { get; set; } = true;
 
         [Description("SCP-207 伤害倍率：0 为完全不掉血，0.5 为原版的一半，1 为原版")]
-        public float DamageMultiplier { get; set; } = 0f;
+        public decimal DamageMultiplier { get; set; } = 0;
     }
 
     public sealed class KillFeedConfig
@@ -67,13 +67,13 @@ namespace BasePlugin_LabAPI.Configs
         public int MaxLines { get; set; } = 4;
 
         [Description("每条播报显示的秒数")]
-        public float LineDuration { get; set; } = 5f;
+        public decimal LineDuration { get; set; } = 5;
 
         [Description("播报位置 Y 坐标（0 为屏幕最上方，1080 为最下方）")]
-        public float YCoordinate { get; set; } = 180f;
+        public decimal YCoordinate { get; set; } = 180;
 
         [Description("播报位置 X 坐标（相对屏幕中心，正数向右）")]
-        public float XCoordinate { get; set; } = 0f;
+        public decimal XCoordinate { get; set; } = 0;
 
         [Description("对齐方式：Left、Center、Right")]
         public HintAlignment Alignment { get; set; } = HintAlignment.Center;
